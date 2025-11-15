@@ -54,6 +54,17 @@ async def get_data():
             app.run(host='0.0.0.0', port=port)
 
 
+
+print("Connecting to Mongo...")
+try:
+    client = AsyncIOMotorClient(mongo_url)
+    client.admin.command("ping")
+    print("MongoDB Connected!")
+except Exception as e:
+    print("MongoDB Error:", e)
+
+
+
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
