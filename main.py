@@ -20,6 +20,11 @@ load_dotenv(ROOT_DIR / '.env')
 # mongodb+srv://ahmad812002_db_user:<db_password>@dana.51p0ug4.mongodb.net/
 
 # MongoDB
+import os
+print("MONGO_URL:", os.environ.get("MONGO_URL"))
+print("DB_NAME:", os.environ.get("DB_NAME"))
+
+
 mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ["DB_NAME"]]
@@ -33,15 +38,6 @@ security = HTTPBearer()
 # FastAPI App
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
-
-# CORS (one clean version)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/api/data")
 async def get_data():
@@ -57,7 +53,6 @@ async def get_data():
 
 print("Connecting to Mongo...")
 try:
-    client = AsyncIOMotorClient(mongo_url)
     client.admin.command("ping")
     print("MongoDB Connected!")
 except Exception as e:
@@ -487,17 +482,17 @@ async def shutdown_db_client():
     client.close()
 
 # Create default admin on startup
-@app.on_event("startup")
-async def create_default_admin():
-    admin_exists = await db.users.find_one({"role": "admin"})
-    if not admin_exists:
-        admin = User(
-            username="admin",
-            password_hash=hash_password("admin123"),
-            role="admin",
-            company_name=None
-        )
-        doc = admin.model_dump()
-        doc['created_at'] = doc['created_at'].isoformat()
-        await db.users.insert_one(doc)
-        logger.info("Default admin created: username=admin, password=admin123")
+# @app.on_event("startup")
+# async def create_default_admin():
+#     admin_exists = await db.users.find_one({"role": "admin"})
+#     if not admin_exists:
+#         admin = User(
+#             username="admin",
+#             password_hash=hash_password("admin123"),
+#             role="admin",
+#             company_name=None
+#         )
+#         doc = admin.model_dump()
+#         doc['created_at'] = doc['created_at'].isoformat()
+#         await db.users.insert_one(doc)
+#         logger.info("Default admin created: username=admin, password=admin123")
