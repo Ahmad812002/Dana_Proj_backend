@@ -44,7 +44,7 @@ security = HTTPBearer()
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-@app.get("/")
+@app.get("/api")
 async def get_data():
     return {"message": "Hello from the backend!"}
 
