@@ -20,14 +20,19 @@ load_dotenv(ROOT_DIR / '.env')
 # mongodb+srv://ahmad812002_db_user:<db_password>@dana.51p0ug4.mongodb.net/
 
 # MongoDB
+
+
 import os
-print("MONGO_URL:", os.environ.get("MONGO_URL"))
-print("DB_NAME:", os.environ.get("DB_NAME"))
 
+mongo_url = os.environ.get("MONGO_URL")
+db_name = os.environ.get("DB_NAME")
 
-mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ["DB_NAME"]]
+db = client[db_name]
+
+print("MONGO_URL:", mongo_url)
+print("DB_NAME:", db_name)
+
 
 # JWT + Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
