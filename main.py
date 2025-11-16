@@ -486,9 +486,6 @@ logger = logging.getLogger(__name__)
 async def shutdown_db_client():
     client.close()
 
-# Create default admin on startup
-@app.on_event("startup")
-async def create_default_admin():
     admin_exists = await db.users.find_one({"role": "admin"})
     if not admin_exists:
         admin_password = "admin123"[:72]  # Truncate to 72 bytes
