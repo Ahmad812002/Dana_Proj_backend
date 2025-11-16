@@ -44,7 +44,7 @@ security = HTTPBearer()
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-@app.get("/api/data")
+@app.get("/")
 async def get_data():
     return {"message": "Hello from the backend!"}
 
@@ -487,17 +487,18 @@ async def shutdown_db_client():
     client.close()
 
 # Create default admin on startup
-# @app.on_event("startup")
-# async def create_default_admin():
-#     admin_exists = await db.users.find_one({"role": "admin"})
-#     if not admin_exists:
-#         admin = User(
-#             username="admin",
-#             password_hash=hash_password("admin123"),
-#             role="admin",
-#             company_name=None
-#         )
-#         doc = admin.model_dump()
-#         doc['created_at'] = doc['created_at'].isoformat()
-#         await db.users.insert_one(doc)
-#         logger.info("Default admin created: username=admin, password=admin123")
+@app.on_event("startup")
+async def create_default_admin():
+    admin_exists = await db.users.find_one({"role": "admin"})
+    if not admin_exists:
+        admin_password = "admin123"[:72]  # Truncate to 72 bytes
+        admin = User(
+            username="admin",
+            password_hash=hash_password(admin_password),
+            role="admin",
+            company_name=None
+        )
+        doc = admin.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.users.insert_one(doc)
+        logger.info("Default admin created: username=admin, password=admin123")
