@@ -487,17 +487,17 @@ async def shutdown_db_client():
     client.close()
 
 # Create default admin on startup
-# @app.on_event("startup")
-# async def create_default_admin():
-#     admin_exists = await db.users.find_one({"role": "admin"})
-#     if not admin_exists:
-#         admin = User(
-#             username="admin",
-#             password_hash=hash_password("admin123"),
-#             role="admin",
-#             company_name=None
-#         )
-#         doc = admin.model_dump()
-#         doc['created_at'] = doc['created_at'].isoformat()
-#         await db.users.insert_one(doc)
-#         logger.info("Default admin created: username=admin, password=admin123")
+@app.on_event("startup")
+async def create_default_admin():
+    admin_exists = await db.users.find_one({"role": "admin"})
+    if not admin_exists:
+        admin = User(
+            username="admin",
+            password_hash=hash_password("admin123"),
+            role="admin",
+            company_name=None
+        )
+        doc = admin.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.users.insert_one(doc)
+        logger.info("Default admin created: username=admin, password=admin123")
