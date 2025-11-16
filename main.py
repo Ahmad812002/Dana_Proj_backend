@@ -486,12 +486,18 @@ logger = logging.getLogger(__name__)
 async def shutdown_db_client():
     client.close()
 
+
+def hash_password(password: str):
+    # truncate to 72 bytes, encode to utf-8 first
+    truncated = password.encode("utf-8")[:72]
+    return pwd_context.hash(truncated)
+    
 # Create default admin on startup
 @app.on_event("startup")
 async def create_default_admin():
     admin_exists = await db.users.find_one({"role": "admin"})
     if not admin_exists:
-        admin_password = "admin123"[:72]  # Truncate to 72 bytes
+        admin_password = "admin123"  # any simple admin password
         admin = User(
             username="admin",
             password_hash=hash_password(admin_password),
@@ -502,3 +508,4 @@ async def create_default_admin():
         doc['created_at'] = doc['created_at'].isoformat()
         await db.users.insert_one(doc)
         logger.info("Default admin created: username=admin, password=admin123")
+
